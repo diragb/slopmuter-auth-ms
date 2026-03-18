@@ -2,7 +2,7 @@
   "name": "slopmuter-auth-ms",
   "version": "0.1.0",
   "description": "Authentication microservice for SlopMuter, a browser extension that filters AI-generated slop and low-effort content from X/Twitter feeds.",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
@@ -15,7 +15,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
