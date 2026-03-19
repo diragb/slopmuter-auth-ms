@@ -30,8 +30,8 @@ const createRefreshToken = async (input: {
   userId: string
   tokenHash: string
   expiresAt: Date
-  userAgent?: string | null
-  ipAddress?: string | null
+  userAgent: string | null
+  ipAddress: string | null
 }) => {
   const result = await pool.query(
     `
@@ -112,7 +112,7 @@ const findActiveRefreshTokenByHash = async (
  */
 const revokeRefreshTokenByHash = async (input: {
   tokenHash: string
-  replacedByTokenHash?: string | null
+  replacedByTokenHash: string | null
 }) => {
   const result = await pool.query(
     `
