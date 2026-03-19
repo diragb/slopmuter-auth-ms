@@ -1,21 +1,20 @@
 // Packages:
-import { logoutSession, refreshSession } from './auth.service'
+import { loginWithGoogle, logoutSession, refreshSession } from './auth.service'
+import { AuthenticationError } from '../../lib/errors'
 
 // Typescript:
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 
 // Functions:
-const googleAuth = async (_req: Request, res: Response) => {
-  return res.status(200).json({
-    'accessToken': 'jwt',
-    'refreshToken': 'opaque_random_token',
-    'expiresIn': 900,
-    'user': {
-      'id': 123,
-      'email': 'x@example.com',
-      'name': 'dirag'
-    }
+const googleAuth = async (req: Request, res: Response) => {
+  const result = await loginWithGoogle({
+    code: req.body.code,
+    redirectUri: req.body.redirectUri,
+    userAgent: req.get('user-agent') || null,
+    ipAddress: req.ip || null,
   })
+
+  return res.status(200).json(result)
 }
 
 const refreshAccessToken = async (req: Request, res: Response) => {
@@ -26,10 +25,7 @@ const refreshAccessToken = async (req: Request, res: Response) => {
   })
 
   if (!result) {
-    return res.status(401).json({
-      error: 'invalid_refresh_token',
-      message: 'Refresh token is invalid, expired, or revoked.',
-    })
+    throw new AuthenticationError('INVALID_REFRESH_TOKEN', 'Refresh token is invalid, expired, or revoked.')
   }
 
   return res.status(200).json(result)
