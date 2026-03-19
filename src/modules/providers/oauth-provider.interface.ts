@@ -11,7 +11,7 @@ interface OAuthIdentity {
 }
 
 interface OAuthProvider {
-  exchangeCode(input: { code: string; redirectUri: string }): Promise<OAuthIdentity>
+  exchangeCode: (input: { code: string; redirectUri: string }) => Promise<OAuthIdentity>
 }
 
 // Exports:

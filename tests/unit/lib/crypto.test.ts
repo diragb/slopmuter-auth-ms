@@ -11,7 +11,7 @@ describe('crypto', () => {
     })
 
     it('produces unique values on successive calls', () => {
-      const tokens = new Set<string>()
+      const tokens: Set<string> = new Set()
       for (let i = 0; i < 100; i++) {
         tokens.add(generateRefreshToken())
       }

@@ -2,6 +2,8 @@
 import { pool } from '../../config/db'
 
 // Typescript:
+import type { QueryResultRow } from 'pg'
+
 interface User {
   id: string
   email: string
@@ -18,14 +20,14 @@ interface User {
  * @param row - Raw row from the database query result.
  * @returns A User object with properly typed fields.
  */
-const mapUserRow = (row: any): User => {
+const mapUserRow = (row: QueryResultRow): User => {
   return {
-    id: String(row.id),
-    email: row.email,
-    name: row.name,
-    avatarUrl: row.avatarUrl,
-    authProvider: row.authProvider,
-    providerUserId: row.providerUserId,
+    id: String(row['id']),
+    email: row['email'],
+    name: row['name'],
+    avatarUrl: row['avatarUrl'],
+    authProvider: row['authProvider'],
+    providerUserId: row['providerUserId'],
   }
 }
 
@@ -49,7 +51,7 @@ const findUserById = async (userId: string): Promise<User | null> => {
       where id = $1
       limit 1
     `,
-    [userId]
+    [userId],
   )
 
   if (result.rowCount === 0) return null
@@ -81,7 +83,7 @@ const findUserByProviderIdentity = async (input: {
         and provider_user_id = $2
       limit 1
     `,
-    [input.authProvider, input.providerUserId]
+    [input.authProvider, input.providerUserId],
   )
 
   if (result.rowCount === 0) return null
@@ -123,13 +125,7 @@ const createUser = async (input: {
         auth_provider as "authProvider",
         provider_user_id as "providerUserId"
     `,
-    [
-      input.email,
-      input.name,
-      input.avatarUrl,
-      input.authProvider,
-      input.providerUserId,
-    ]
+    [input.email, input.name, input.avatarUrl, input.authProvider, input.providerUserId],
   )
 
   return mapUserRow(result.rows[0])
@@ -168,10 +164,5 @@ const findOrCreateUserByGoogleIdentity = async (input: {
 }
 
 // Exports:
-export {
-  findUserById,
-  findUserByProviderIdentity,
-  createUser,
-  findOrCreateUserByGoogleIdentity,
-}
+export { findUserById, findUserByProviderIdentity, createUser, findOrCreateUserByGoogleIdentity }
 export type { User }

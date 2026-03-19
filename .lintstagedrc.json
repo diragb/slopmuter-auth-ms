@@ -1,0 +1,6 @@
+{
+  "*.ts": [
+    "prettier --write",
+    "yarn lint --fix --no-warn-ignored"
+  ]
+}

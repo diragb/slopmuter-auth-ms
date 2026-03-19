@@ -1,21 +1,17 @@
 // Packages:
 import { vi } from 'vitest'
 import request from 'supertest'
-import {
-  startTestDatabase,
-  stopTestDatabase,
-  cleanTables,
-  getTestPool,
-} from '../setup/test-db'
+import { startTestDatabase, stopTestDatabase, cleanTables, getTestPool } from '../setup/test-db'
 
 // Typescript:
+import type { Pool } from 'pg'
 import type { Application } from 'express'
 
 // Constants:
 const ALLOWED_REDIRECT_URI = 'http://localhost:3000/auth/google/callback'
 
 // Mocks:
-const dbRef = vi.hoisted(() => ({ pool: null as any }))
+const dbRef = vi.hoisted(() => ({ pool: null as Pool | null }))
 const mockExchangeCodeForGoogleIdentity = vi.fn()
 
 vi.mock('../../src/config/db', () => ({
@@ -31,17 +27,20 @@ vi.mock('../../src/config/redis', () => ({
   },
 }))
 vi.mock('../../src/middleware/rate-limiter', () => ({
-  globalLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
-  authLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
+  globalLimiter: (_req: unknown, _res: unknown, next: () => void) => {
+    next()
+  },
+  authLimiter: (_req: unknown, _res: unknown, next: () => void) => {
+    next()
+  },
 }))
 vi.mock('../../src/modules/providers/google-oauth.provider', () => ({
-  exchangeCodeForGoogleIdentity: (input: unknown) =>
-    mockExchangeCodeForGoogleIdentity(input),
+  exchangeCodeForGoogleIdentity: (input: unknown) => mockExchangeCodeForGoogleIdentity(input),
 }))
 
 // Tests:
 describe('auth google routes', () => {
-  let app: Application
+  let app: Application = null as unknown as Application
 
   beforeAll(async () => {
     dbRef.pool = await startTestDatabase()
@@ -88,10 +87,8 @@ describe('auth google routes', () => {
 
     const pool = getTestPool()
     expect(pool).not.toBeNull()
-    const users = await pool!.query(
-      'SELECT id, email, name FROM users WHERE email = $1',
-      ['google-user@example.com']
-    )
+    if (!pool) throw new Error('Test pool not ready')
+    const users = await pool.query('SELECT id, email, name FROM users WHERE email = $1', ['google-user@example.com'])
     expect(users.rows).toHaveLength(1)
   })
 
@@ -127,10 +124,8 @@ describe('auth google routes', () => {
 
     const pool = getTestPool()
     expect(pool).not.toBeNull()
-    const users = await pool!.query(
-      'SELECT id FROM users WHERE provider_user_id = $1',
-      ['google-same-1']
-    )
+    if (!pool) throw new Error('Test pool not ready')
+    const users = await pool.query('SELECT id FROM users WHERE provider_user_id = $1', ['google-same-1'])
     expect(users.rows).toHaveLength(1)
   })
 
@@ -157,10 +152,7 @@ describe('auth google routes', () => {
   })
 
   it('POST /v1/auth/google with missing body returns 400', async () => {
-    const res = await request(app)
-      .post('/v1/auth/google')
-      .send({})
-      .set('Content-Type', 'application/json')
+    const res = await request(app).post('/v1/auth/google').send({}).set('Content-Type', 'application/json')
 
     expect(res.status).toBe(400)
     expect(res.body.error?.code).toBe('VALIDATION_ERROR')

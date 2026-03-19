@@ -1,11 +1,14 @@
 // Packages:
 import { vi } from 'vitest'
 import request from 'supertest'
-import type { Application } from 'express'
 import { startTestDatabase, stopTestDatabase } from '../setup/test-db'
 
+// Typescript:
+import type { Pool } from 'pg'
+import type { Application } from 'express'
+
 // Mocks:
-const dbRef = vi.hoisted(() => ({ pool: null as any }))
+const dbRef = vi.hoisted(() => ({ pool: null as Pool | null }))
 
 vi.mock('../../src/config/db', () => ({
   get pool() {
@@ -20,13 +23,17 @@ vi.mock('../../src/config/redis', () => ({
   },
 }))
 vi.mock('../../src/middleware/rate-limiter', () => ({
-  globalLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
-  authLimiter: (_req: unknown, _res: unknown, next: () => void) => next(),
+  globalLimiter: (_req: unknown, _res: unknown, next: () => void) => {
+    next()
+  },
+  authLimiter: (_req: unknown, _res: unknown, next: () => void) => {
+    next()
+  },
 }))
 
 // Tests:
 describe('health routes', () => {
-  let app: Application
+  let app: Application = null as unknown as Application
 
   beforeAll(async () => {
     dbRef.pool = await startTestDatabase()

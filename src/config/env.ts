@@ -27,15 +27,24 @@ const env = {
   redisUrl: process.env['REDIS_URL'] || 'redis://localhost:6379',
 
   appBaseUrl: process.env['APP_BASE_URL'] || '',
-  allowedOrigins: (process.env['ALLOWED_ORIGINS'] || 'chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000').split(',').map(s => s.trim()),
-  allowedCallbackUrls: (process.env['ALLOWED_CALLBACK_URLS'] || 'https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback').split(',')
+  allowedOrigins: (
+    process.env['ALLOWED_ORIGINS'] ||
+    'chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000'
+  )
+    .split(',')
+    .map(str => str.trim()),
+  allowedCallbackUrls: (
+    process.env['ALLOWED_CALLBACK_URLS'] ||
+    'https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback'
+  ).split(','),
 } as const
 
 if (!env.databaseUrl) throw new Error('DATABASE_URL is not set')
 if (!env.jwtAccessSecret) throw new Error('JWT_ACCESS_SECRET is not set')
-if (typeof ms(env.jwtAccessExpiresIn as ms.StringValue) !== 'number') throw new Error('JWT_ACCESS_EXPIRES_IN is invalid')
-if (!env.googleClientId) throw new Error("GOOGLE_CLIENT_ID is not set")
-if (!env.googleClientSecret) throw new Error("GOOGLE_CLIENT_SECRET is not set")
+if (typeof ms(env.jwtAccessExpiresIn as ms.StringValue) !== 'number')
+  throw new Error('JWT_ACCESS_EXPIRES_IN is invalid')
+if (!env.googleClientId) throw new Error('GOOGLE_CLIENT_ID is not set')
+if (!env.googleClientSecret) throw new Error('GOOGLE_CLIENT_SECRET is not set')
 
 // Exports:
 export default env

@@ -1,0 +1,10 @@
+# Artifacts:
+.yarn
+dist
+node_modules
+
+# Non-formattable files:
+migrations
+**/Dockerfile
+**/LICENSE
+**/*.lock

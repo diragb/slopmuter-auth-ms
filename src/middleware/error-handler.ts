@@ -8,19 +8,11 @@ import type { NextFunction, Request, Response } from 'express'
 import { AppError } from '../lib/errors'
 
 // Functions:
-const errorHandler = (
-  error: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-) => {
-  const log = req.log ?? logger
+const errorHandler = (error: unknown, req: Request, res: Response, _next: NextFunction) => {
+  const log = (req as unknown as { log?: typeof logger }).log ?? logger
 
   if (error instanceof AppError) {
-    log.warn(
-      { err: error, code: error.code, statusCode: error.statusCode },
-      error.message,
-    )
+    log.warn({ err: error, code: error.code, statusCode: error.statusCode }, error.message)
 
     const errorBody: { code: string; message: string; details?: unknown } = {
       code: error.code,
