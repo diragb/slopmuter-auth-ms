@@ -24,6 +24,8 @@ const env = {
   googleClientSecret: process.env['GOOGLE_CLIENT_SECRET'] || '',
   googleTokenEndpoint: process.env['GOOGLE_TOKEN_ENDPOINT'] || 'https://oauth2.googleapis.com/token',
 
+  redisUrl: process.env['REDIS_URL'] || 'redis://localhost:6379',
+
   appBaseUrl: process.env['APP_BASE_URL'] || '',
   allowedOrigins: (process.env['ALLOWED_ORIGINS'] || 'chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000').split(',').map(s => s.trim()),
   allowedCallbackUrls: (process.env['ALLOWED_CALLBACK_URLS'] || 'https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback').split(',')

@@ -7,11 +7,15 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx --watch src/server.ts",
-    "create:test:refresh": "node scripts/create-test-refresh-token.js",
     "db:start": "docker compose up -d postgres",
     "db:stop": "docker compose down",
     "db:shell": "docker exec -it auth-service-postgres psql -U postgres -d auth_service",
-    "db:migrate": "node scripts/run-migration.js"
+    "db:migrate": "node scripts/run-migration.js",
+    "redis:start": "docker compose up -d redis",
+    "redis:stop": "docker compose stop redis",
+    "redis:shell": "docker exec -it auth-service-redis redis-cli",
+    "containers:start": "npx concurrently \"yarn db:start\" \"yarn redis:start\"",
+    "containers:stop": "npx concurrently \"yarn db:stop\" \"yarn redis:stop\""
   },
   "keywords": [],
   "author": "",
@@ -21,11 +25,14 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
     "google-auth-library": "^10.6.2",
     "helmet": "^8.1.0",
+    "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "pino": "^10.3.1",
+    "rate-limit-redis": "^4.3.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -12,59 +12,77 @@ A stateless authentication API built with Express and TypeScript, providing Goog
 - JWT access tokens (15 min expiry)
 - Secure refresh token rotation (30 day expiry)
 - PostgreSQL-backed token storage
+- Redis-backed request rate limiting
+  - Global limiter: max 200 requests per minute
+  - Auth limiter: max 10 requests per minute on `/v1/auth`
 - Dockerized for consistent deployment
 - Extensible provider architecture for future OAuth providers
 
 ## Installation
 
 ```bash
-npm install
+yarn install
 ```
 
 ## Getting Started
 
 ### Local Development
 
-1. Start the local PostgreSQL database:
-```bash
-npm run db:start
-```
+**Note:** If you don't have Docker installed, download and install it from [https://www.docker.com/get-started](https://www.docker.com/get-started) and ensure Docker is running before continuing.
+
+
+1. Start the local Docker containers in detached mode (PostgreSQL + Redis):
+
+  ```bash
+  yarn containers:start
+  ```
+
+  If you prefer starting them individually:
+
+  ```bash
+  yarn db:start && yarn redis:start
+  ```
 
 2. Run database migrations:
-```bash
-npm run db:migrate
-```
+
+  ```bash
+  yarn db:migrate
+  ```
 
 3. Create a `.env` file with required environment variables, check `.env.example`.
-```env
-SERVICE_NAME=auth-service
-NODE_ENV=production
-PORT=8080
 
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=auth_service
-DATABASE_URL=postgresql://postgres:postgres@localhost:5433/auth_service
+  ```env
+  SERVICE_NAME=auth-service
+  NODE_ENV=production
+  PORT=8080
 
-JWT_ACCESS_SECRET=...
-JWT_ACCESS_EXPIRES_IN=15M
-REFRESH_TOKEN_TTL_DAYS=30
+  POSTGRES_USER=postgres
+  POSTGRES_PASSWORD=postgres
+  POSTGRES_DB=auth_service
+  DATABASE_URL=postgresql://postgres:postgres@localhost:5433/auth_service
 
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-GOOGLE_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token
+  JWT_ACCESS_SECRET=...
+  JWT_ACCESS_EXPIRES_IN=15M
+  REFRESH_TOKEN_TTL_DAYS=30
 
-APP_BASE_URL=https://api.slopmuter.com
-ALLOWED_ORIGINS=chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000
-ALLOWED_CALLBACK_URLS=https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback
-```
+  GOOGLE_CLIENT_ID=...
+  GOOGLE_CLIENT_SECRET=...
+  GOOGLE_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token
+
+  REDIS_URL=redis://redis:6379
+
+  APP_BASE_URL=https://api.slopmuter.com
+  ALLOWED_ORIGINS=chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000
+  ALLOWED_CALLBACK_URLS=https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback
+  ```
 
 4. Start the development server:
-```bash
-npm run dev
-```
 
-The service will be available at `http://localhost:8080`.
+  ```bash
+  yarn dev
+  ```
+
+  The service will be available at `http://localhost:8080`.
 
 ## API Endpoints
 
@@ -75,14 +93,16 @@ The service will be available at `http://localhost:8080`.
 
 ## Deployment
 
-The service is containerized and can be deployed to EC2, ECS, or any Docker-compatible environment. See the included `Dockerfile` and `docker-compose.yml` for deployment configuration.
+The service is containerized and can be deployed to EC2, ECS, or any Docker-compatible environment. See the included `Dockerfile` and `compose.yml` for deployment configuration.
 
 ## Tech Stack
 
 - Express + TypeScript
 - PostgreSQL (AWS RDS)
+- Redis (rate limiting store)
 - JWT for access tokens
 - Docker
+- express-rate-limit + rate-limit-redis
 - Zod for validation
 
 ## Contributing

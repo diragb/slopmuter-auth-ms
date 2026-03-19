@@ -4,6 +4,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { requestLogger } from './middleware/request-logger'
 import { errorHandler } from './middleware/error-handler'
+import { globalLimiter, authLimiter } from './middleware/rate-limiter'
 
 // Typescript:
 import type { Application } from 'express'
@@ -26,9 +27,10 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(requestLogger)
+app.use(globalLimiter)
 
 app.use('/v1/health', healthRouter)
-app.use('/v1/auth', authRouter)
+app.use('/v1/auth', authLimiter, authRouter)
 
 app.use(errorHandler)
 
