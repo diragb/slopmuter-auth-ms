@@ -25,7 +25,8 @@ const env = {
   googleTokenEndpoint: process.env['GOOGLE_TOKEN_ENDPOINT'] || 'https://oauth2.googleapis.com/token',
 
   appBaseUrl: process.env['APP_BASE_URL'] || '',
-  allowedOrigins: process.env['ALLOWED_ORIGINS'] || '',
+  allowedOrigins: (process.env['ALLOWED_ORIGINS'] || 'chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000').split(',').map(s => s.trim()),
+  allowedCallbackUrls: (process.env['ALLOWED_CALLBACK_URLS'] || 'https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback').split(',')
 } as const
 
 if (!env.databaseUrl) throw new Error('DATABASE_URL is not set')

@@ -21,7 +21,7 @@ const app: Application = express()
 // Middlewares:
 app.use(helmet())
 app.use(cors({
-  origin: env.allowedOrigins.split(',').map(s => s.trim()),
+  origin: env.allowedOrigins,
   credentials: true,
 }))
 app.use(express.json())

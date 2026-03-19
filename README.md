@@ -32,19 +32,31 @@ npm run db:start
 
 2. Run database migrations:
 ```bash
-npm run migrate
+npm run db:migrate
 ```
 
-3. Create a `.env` file with required environment variables:
+3. Create a `.env` file with required environment variables, check `.env.example`.
 ```env
-NODE_ENV=development
+SERVICE_NAME=auth-service
+NODE_ENV=production
 PORT=8080
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/auth_service
-JWT_ACCESS_SECRET=your-secret-key
-JWT_ACCESS_EXPIRES_IN=15m
+
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=auth_service
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/auth_service
+
+JWT_ACCESS_SECRET=...
+JWT_ACCESS_EXPIRES_IN=15M
 REFRESH_TOKEN_TTL_DAYS=30
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token
+
+APP_BASE_URL=https://api.slopmuter.com
+ALLOWED_ORIGINS=chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000
+ALLOWED_CALLBACK_URLS=https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback
 ```
 
 4. Start the development server:
@@ -95,6 +107,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<div align="center">
-  Made with ❤️ by <a href="https://github.com/diragb">Dirag Biswas</a>
-</div>
+Made with ❤️ by [Dirag Biswas](https://github.com/diragb)
