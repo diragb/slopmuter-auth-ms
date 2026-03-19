@@ -24,9 +24,7 @@ const refreshAccessToken = async (req: Request, res: Response) => {
     ipAddress: req.ip || null,
   })
 
-  if (!result) {
-    throw new AuthenticationError('INVALID_REFRESH_TOKEN', 'Refresh token is invalid, expired, or revoked.')
-  }
+  if (!result) throw new AuthenticationError('INVALID_REFRESH_TOKEN', 'Refresh token is invalid, expired, or revoked.')
 
   return res.status(200).json(result)
 }
