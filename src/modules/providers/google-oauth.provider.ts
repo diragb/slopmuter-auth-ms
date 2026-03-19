@@ -4,14 +4,7 @@ import { AuthenticationError } from '../../lib/errors'
 import logger from '../../lib/logger'
 
 // Typescript:
-interface GoogleIdentity {
-  provider: 'google'
-  providerUserId: string
-  email: string
-  emailVerified: boolean
-  name: string | null
-  avatarUrl: string | null
-}
+import type { OAuthIdentity, OAuthProvider } from './oauth-provider.interface'
 
 interface GoogleTokenResponse {
   access_token?: string
@@ -33,7 +26,7 @@ const oauthClient = new OAuth2Client(env.googleClientId)
 const exchangeCodeForGoogleIdentity = async (input: {
   code: string
   redirectUri: string
-}): Promise<GoogleIdentity> => {
+}): Promise<OAuthIdentity> => {
   const response = await fetch(env.googleTokenEndpoint, {
     method: 'POST',
     headers: {
@@ -86,6 +79,10 @@ const exchangeCodeForGoogleIdentity = async (input: {
   }
 }
 
+const googleOAuthProvider: OAuthProvider = {
+  exchangeCode: exchangeCodeForGoogleIdentity,
+}
+
 // Exports:
-export { exchangeCodeForGoogleIdentity }
-export type { GoogleIdentity, GoogleTokenResponse }
+export { exchangeCodeForGoogleIdentity, googleOAuthProvider }
+export type { GoogleTokenResponse }

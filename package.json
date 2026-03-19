@@ -4,7 +4,7 @@
   "description": "Authentication microservice for SlopMuter, a browser extension that filters AI-generated slop and low-effort content from X/Twitter feeds.",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.prod.json",
     "start": "node dist/server.js",
     "dev": "tsx --watch src/server.ts",
     "db:start": "docker compose up -d postgres",
@@ -15,7 +15,12 @@
     "redis:stop": "docker compose stop redis",
     "redis:shell": "docker exec -it auth-service-redis redis-cli",
     "containers:start": "npx concurrently \"yarn db:start\" \"yarn redis:start\"",
-    "containers:stop": "npx concurrently \"yarn db:stop\" \"yarn redis:stop\""
+    "containers:stop": "npx concurrently \"yarn db:stop\" \"yarn redis:stop\"",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": "",
@@ -36,13 +41,22 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@testcontainers/postgresql": "^11.13.0",
     "@types/cors": "^2",
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9",
     "@types/node": "^25.5.0",
     "@types/pg": "^8",
+    "@types/supertest": "^7",
+    "@vitest/ui": "^4.1.0",
+    "msw": "^2.12.13",
     "pino-pretty": "^13.1.3",
+    "supertest": "^7.2.2",
+    "testcontainers": "^11.13.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }
