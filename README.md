@@ -24,65 +24,70 @@ A stateless authentication API built with Express and TypeScript, providing Goog
 yarn install
 ```
 
+## Prerequisites
+
+**You must have [slopmuter-infra](https://github.com/diragb/slopmuter-infra) running before starting this service.** The shared infrastructure (PostgreSQL + Redis) must be started first. Clone the infra repo and run `yarn containers:start` there.
+
 ## Getting Started
 
 ### Local Development
 
 **Note:** If you don't have Docker installed, download and install it from [https://www.docker.com/get-started](https://www.docker.com/get-started) and ensure Docker is running before continuing.
 
+1. **Start shared infrastructure.** Clone and start [slopmuter-infra](https://github.com/diragb/slopmuter-infra):
 
-1. Start the local Docker containers in detached mode (PostgreSQL + Redis):
+   ```bash
+   # In slopmuter-infra directory
+   yarn containers:Start
+   ```
 
-  ```bash
-  yarn containers:start
-  ```
+2. **Run database migrations.** Migrations are managed by slopmuter-infra. Run them from that repo:
+   ```bash
+   yarn db:migrate
+   ```
 
-  If you prefer starting them individually:
+3. **Create a `.env` file** with required environment variables (see `.env.example`):
 
-  ```bash
-  yarn db:start && yarn redis:start
-  ```
+   ```env
+   SERVICE_NAME=auth-service
+   NODE_ENV=production
+   PORT=8080
 
-2. Run database migrations:
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=postgres
+   POSTGRES_DB=slopmuter
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5433/slopmuter
 
-  ```bash
-  yarn db:migrate
-  ```
+   JWT_ACCESS_SECRET=...
+   JWT_ACCESS_EXPIRES_IN=15M
+   REFRESH_TOKEN_TTL_DAYS=30
 
-3. Create a `.env` file with required environment variables, check `.env.example`.
+   GOOGLE_CLIENT_ID=...
+   GOOGLE_CLIENT_SECRET=...
+   GOOGLE_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token
 
-  ```env
-  SERVICE_NAME=auth-service
-  NODE_ENV=production
-  PORT=8080
+   REDIS_URL=redis://localhost:6379
 
-  POSTGRES_USER=postgres
-  POSTGRES_PASSWORD=postgres
-  POSTGRES_DB=auth_service
-  DATABASE_URL=postgresql://postgres:postgres@localhost:5433/auth_service
+   APP_BASE_URL=https://api.slopmuter.com
+   ALLOWED_ORIGINS=chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000
+   ALLOWED_CALLBACK_URLS=https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback
+   ```
 
-  JWT_ACCESS_SECRET=...
-  JWT_ACCESS_EXPIRES_IN=15M
-  REFRESH_TOKEN_TTL_DAYS=30
+4. **Start the development server:**
 
-  GOOGLE_CLIENT_ID=...
-  GOOGLE_CLIENT_SECRET=...
-  GOOGLE_TOKEN_ENDPOINT=https://oauth2.googleapis.com/token
+   ```bash
+   yarn dev
+   ```
 
-  REDIS_URL=redis://redis:6379
+   The service will be available at `http://localhost:8080`.
 
-  APP_BASE_URL=https://api.slopmuter.com
-  ALLOWED_ORIGINS=chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000
-  ALLOWED_CALLBACK_URLS=https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback
-  ```
+### Running with Docker Compose
 
-4. Start the development server:
+The `compose.yml` in this repo spins up **only the API service**. It assumes slopmuter-infra is already running. Ensure PostgreSQL and Redis are available at `localhost:5433` and `localhost:6379` before running:
 
-  ```bash
-  yarn dev
-  ```
-
-  The service will be available at `http://localhost:8080`.
+```bash
+yarn docker:start
+```
 
 ## API Endpoints
 

@@ -22,10 +22,10 @@ export const startTestDatabase = async (): Promise<Pool> => {
 
   pool = new Pool({ connectionString: connectionUri })
 
-  const migrationsDir = path.join(__dirname, '..', '..', 'migrations')
+  const migrationsDir = path.join(__dirname, '..', '..', '..', 'slopmuter-infra', 'migrations')
   const files = fs
     .readdirSync(migrationsDir)
-    .filter((file) => file.endsWith('.sql'))
+    .filter(file => file.endsWith('.sql'))
     .sort()
 
   const client = await pool.connect()
@@ -42,11 +42,12 @@ export const startTestDatabase = async (): Promise<Pool> => {
   return pool
 }
 
-export const stopTestDatabase = async(): Promise<void> => {
+export const stopTestDatabase = async (): Promise<void> => {
   if (pool) {
     await pool.end()
     pool = null
-  } if (container) {
+  }
+  if (container) {
     await container.stop()
     container = null
   }

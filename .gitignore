@@ -11,6 +11,7 @@ node_modules/
 # Build output
 dist/
 build/
+out/
 *.js.map
 
 # Environment variables
@@ -44,6 +45,10 @@ coverage/
 tmp/
 temp/
 *.tmp
+
+# Misc
+*.local
+*.log
 
 # TypeScript cache
 *.tsbuildinfo

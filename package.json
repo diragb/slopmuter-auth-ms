@@ -6,16 +6,11 @@
   "scripts": {
     "build": "tsc --project tsconfig.prod.json",
     "start": "node dist/server.js",
+    "docker:start": "docker compose up --build -d",
+    "docker:stop": "docker compose down",
     "dev": "tsx --watch src/server.ts",
-    "db:start": "docker compose up -d postgres",
-    "db:stop": "docker compose down",
-    "db:shell": "docker exec -it auth-service-postgres psql -U postgres -d auth_service",
-    "db:migrate": "node scripts/run-migration.js",
-    "redis:start": "docker compose up -d redis",
-    "redis:stop": "docker compose stop redis",
-    "redis:shell": "docker exec -it auth-service-redis redis-cli",
-    "containers:start": "npx concurrently \"yarn db:start\" \"yarn redis:start\"",
-    "containers:stop": "npx concurrently \"yarn db:stop\" \"yarn redis:stop\"",
+    "db:shell": "docker exec -it slopmuter-postgres psql -U postgres -d slopmuter",
+    "redis:shell": "docker exec -it slopmuter-redis redis-cli",
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
@@ -25,7 +20,15 @@
     "prepare": "husky"
   },
   "keywords": [],
-  "author": "",
+  "author": "Dirag Biswas (https://github.com/diragb)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diragb/slopmuter-auth-ms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/diragb/slopmuter-auth-ms/issues"
+  },
+  "homepage": "https://github.com/diragb/slopmuter-auth-ms#readme",
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {
