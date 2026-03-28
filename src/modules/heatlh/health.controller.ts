@@ -2,7 +2,7 @@
 import type { Request, Response } from 'express'
 
 // Constants:
-import env from '../../config/env'
+import { env } from '../../config/env'
 
 // Functions:
 const getHealth = (_req: Request, res: Response) => {
@@ -14,6 +14,4 @@ const getHealth = (_req: Request, res: Response) => {
 }
 
 // Exports:
-export {
-  getHealth,
-}
+export { getHealth }

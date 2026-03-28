@@ -1,11 +1,10 @@
-
 // Packages:
 import { pool } from '../../config/db'
 
 // Typescript:
 interface RefreshTokenRecord {
   id: string
-  userId: string
+  userId: number
   tokenHash: string
   expiresAt: string
   createdAt: string
@@ -27,7 +26,7 @@ interface RefreshTokenRecord {
  * @returns The inserted refresh token record as returned by the database.
  */
 const createRefreshToken = async (input: {
-  userId: string
+  userId: number
   tokenHash: string
   expiresAt: Date
   userAgent: string | null
@@ -45,7 +44,7 @@ const createRefreshToken = async (input: {
       values ($1, $2, $3, $4, $5)
       returning
         id::text,
-        user_id::text as "userId",
+        user_id as "userId",
         token_hash as "tokenHash",
         expires_at as "expiresAt",
         created_at as "createdAt",
@@ -54,13 +53,7 @@ const createRefreshToken = async (input: {
         user_agent as "userAgent",
         ip_address::text as "ipAddress"
     `,
-    [
-      input.userId,
-      input.tokenHash,
-      input.expiresAt,
-      input.userAgent ?? null,
-      input.ipAddress ?? null,
-    ]
+    [input.userId, input.tokenHash, input.expiresAt, input.userAgent ?? null, input.ipAddress ?? null],
   )
 
   return result.rows[0] as RefreshTokenRecord
@@ -74,14 +67,12 @@ const createRefreshToken = async (input: {
  * @param tokenHash - Hash of the refresh token to look up.
  * @returns The matching refresh token record, or null if none is active.
  */
-const findActiveRefreshTokenByHash = async (
-  tokenHash: string
-): Promise<RefreshTokenRecord | null> => {
+const findActiveRefreshTokenByHash = async (tokenHash: string): Promise<RefreshTokenRecord | null> => {
   const result = await pool.query(
     `
       select
         id::text,
-        user_id::text as "userId",
+        user_id as "userId",
         token_hash as "tokenHash",
         expires_at as "expiresAt",
         created_at as "createdAt",
@@ -95,7 +86,7 @@ const findActiveRefreshTokenByHash = async (
         and expires_at > now()
       limit 1
     `,
-    [tokenHash]
+    [tokenHash],
   )
 
   return result.rows[0] || null
@@ -110,10 +101,7 @@ const findActiveRefreshTokenByHash = async (
  * @param input.replacedByTokenHash - Optional hash of the token that replaced it (for rotation).
  * @returns True if a token was revoked; false if no active (non-revoked) token matched.
  */
-const revokeRefreshTokenByHash = async (input: {
-  tokenHash: string
-  replacedByTokenHash: string | null
-}) => {
+const revokeRefreshTokenByHash = async (input: { tokenHash: string; replacedByTokenHash: string | null }) => {
   const result = await pool.query(
     `
       update refresh_tokens
@@ -124,16 +112,12 @@ const revokeRefreshTokenByHash = async (input: {
         and revoked_at is null
       returning id::text
     `,
-    [input.tokenHash, input.replacedByTokenHash ?? null]
+    [input.tokenHash, input.replacedByTokenHash ?? null],
   )
 
   return (result.rowCount ?? 0) > 0
 }
 
 // Exports:
-export {
-  createRefreshToken,
-  findActiveRefreshTokenByHash,
-  revokeRefreshTokenByHash,
-}
+export { createRefreshToken, findActiveRefreshTokenByHash, revokeRefreshTokenByHash }
 export type { RefreshTokenRecord }

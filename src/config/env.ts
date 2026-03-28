@@ -1,50 +1,73 @@
 // Packages:
-import dotenv from 'dotenv'
+import { config } from 'dotenv'
 import ms from 'ms'
+import { z } from 'zod'
 
 // Typescript:
 import type { SignOptions } from 'jsonwebtoken'
 
 // Functions:
-dotenv.config()
+config()
 
 // Constants:
-const env = {
-  serviceName: process.env['SERVICE_NAME'] || 'auth-service',
-  nodeEnv: process.env['NODE_ENV'] || 'development',
-  port: Number(process.env['PORT']) || 8080,
+const envSchema = z.object({
+  SERVICE_NAME: z.string().min(1).default('auth-service'),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PORT: z.coerce.number().int().positive().default(8080),
 
-  databaseUrl: process.env['DATABASE_URL'] || '',
+  DATABASE_URL: z.string().min(1),
 
-  jwtAccessSecret: process.env['JWT_ACCESS_SECRET'] || '',
-  jwtAccessExpiresIn: (process.env['JWT_ACCESS_EXPIRES_IN'] || '15m') as SignOptions['expiresIn'],
-  refreshTokenTtlDays: Number(process.env['REFRESH_TOKEN_TTL_DAYS']) || 30,
+  JWT_ACCESS_SECRET: z.string().min(1),
+  JWT_ACCESS_EXPIRES_IN: z
+    .string()
+    .default('15m')
+    .refine(val => typeof ms(val as ms.StringValue) === 'number', {
+      message: 'JWT_ACCESS_EXPIRES_IN is invalid',
+    }),
+  REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
 
-  googleClientId: process.env['GOOGLE_CLIENT_ID'] || '',
-  googleClientSecret: process.env['GOOGLE_CLIENT_SECRET'] || '',
-  googleTokenEndpoint: process.env['GOOGLE_TOKEN_ENDPOINT'] || 'https://oauth2.googleapis.com/token',
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_TOKEN_ENDPOINT: z.string().default('https://oauth2.googleapis.com/token'),
 
-  redisUrl: process.env['REDIS_URL'] || 'redis://localhost:6379',
+  REDIS_URL: z.string().default('redis://localhost:6379'),
 
-  appBaseUrl: process.env['APP_BASE_URL'] || '',
-  allowedOrigins: (
-    process.env['ALLOWED_ORIGINS'] ||
-    'chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000'
-  )
-    .split(',')
-    .map(str => str.trim()),
-  allowedCallbackUrls: (
-    process.env['ALLOWED_CALLBACK_URLS'] ||
-    'https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback'
-  ).split(','),
-} as const
+  APP_BASE_URL: z.string().default(''),
+  ALLOWED_ORIGINS: z
+    .string()
+    .default('chrome-extension://mcihoalbpibkcngfpohfolldkicapgcj,https://slopmuter.com,http://localhost:3000'),
+  ALLOWED_CALLBACK_URLS: z
+    .string()
+    .default('https://slopmuter.com/auth/google/callback,http://localhost:3000/auth/google/callback'),
+})
 
-if (!env.databaseUrl) throw new Error('DATABASE_URL is not set')
-if (!env.jwtAccessSecret) throw new Error('JWT_ACCESS_SECRET is not set')
-if (typeof ms(env.jwtAccessExpiresIn as ms.StringValue) !== 'number')
-  throw new Error('JWT_ACCESS_EXPIRES_IN is invalid')
-if (!env.googleClientId) throw new Error('GOOGLE_CLIENT_ID is not set')
-if (!env.googleClientSecret) throw new Error('GOOGLE_CLIENT_SECRET is not set')
+const parsedEnv = envSchema.safeParse(process.env)
+
+if (!parsedEnv.success) {
+  console.error('Invalid environment variables:', z.treeifyError(parsedEnv.error))
+  process.exit(1)
+}
+
+const rawEnv = parsedEnv.data
 
 // Exports:
-export default env
+export const env = {
+  serviceName: rawEnv.SERVICE_NAME,
+  nodeEnv: rawEnv.NODE_ENV,
+  port: rawEnv.PORT,
+  databaseUrl: rawEnv.DATABASE_URL,
+  jwtAccessSecret: rawEnv.JWT_ACCESS_SECRET,
+  jwtAccessExpiresIn: rawEnv.JWT_ACCESS_EXPIRES_IN as SignOptions['expiresIn'],
+  refreshTokenTtlDays: rawEnv.REFRESH_TOKEN_TTL_DAYS,
+  googleClientId: rawEnv.GOOGLE_CLIENT_ID,
+  googleClientSecret: rawEnv.GOOGLE_CLIENT_SECRET,
+  googleTokenEndpoint: rawEnv.GOOGLE_TOKEN_ENDPOINT,
+  redisUrl: rawEnv.REDIS_URL,
+  appBaseUrl: rawEnv.APP_BASE_URL,
+  allowedOrigins: rawEnv.ALLOWED_ORIGINS.split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean),
+  allowedCallbackUrls: rawEnv.ALLOWED_CALLBACK_URLS.split(',')
+    .map(url => url.trim())
+    .filter(Boolean),
+}

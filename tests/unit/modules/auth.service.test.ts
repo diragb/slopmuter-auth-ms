@@ -1,10 +1,6 @@
 // Packages:
 import { vi } from 'vitest'
-import {
-  refreshSession,
-  loginWithGoogle,
-  logoutSession,
-} from '../../../src/modules/auth/auth.service'
+import { refreshSession, loginWithGoogle, logoutSession } from '../../../src/modules/auth/auth.service'
 import { AuthenticationError } from '../../../src/lib/errors'
 import { hashToken } from '../../../src/lib/crypto'
 import { findUserById, findOrCreateUserByGoogleIdentity } from '../../../src/modules/users/user.repository'
@@ -23,7 +19,7 @@ const mockFindActiveRefreshTokenByHash = vi.mocked(findActiveRefreshTokenByHash)
 const mockRevokeRefreshTokenByHash = vi.mocked(revokeRefreshTokenByHash)
 const mockExchangeCodeForGoogleIdentity = vi.mocked(exchangeCodeForGoogleIdentity)
 const mockUser = {
-  id: 'user-1',
+  id: 1,
   email: 'test@example.com',
   name: 'Test User',
   avatarUrl: 'https://example.com/avatar.png',
@@ -33,7 +29,7 @@ const mockUser = {
 
 const mockTokenRecord = {
   id: 'token-1',
-  userId: 'user-1',
+  userId: 1,
   tokenHash: 'hash',
   expiresAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
@@ -121,10 +117,10 @@ describe('auth.service', () => {
       })
       expect(mockCreateRefreshToken).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: 'user-1',
+          userId: 1,
           userAgent: null,
           ipAddress: null,
-        })
+        }),
       )
     })
   })
@@ -146,7 +142,7 @@ describe('auth.service', () => {
           redirectUri: 'http://localhost:3000/auth/google/callback',
           userAgent: null,
           ipAddress: null,
-        })
+        }),
       ).rejects.toThrow(AuthenticationError)
 
       expect(mockFindOrCreateUserByGoogleIdentity).not.toHaveBeenCalled()
@@ -180,7 +176,7 @@ describe('auth.service', () => {
         providerUserId: 'google-123',
       })
       expect(result.user).toEqual({
-        id: 'user-1',
+        id: 1,
         email: 'test@example.com',
         name: 'Test User',
         avatarUrl: 'https://example.com/avatar.png',

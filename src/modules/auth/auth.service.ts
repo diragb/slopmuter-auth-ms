@@ -11,7 +11,7 @@ import { exchangeCodeForGoogleIdentity } from '../providers/google-oauth.provide
 import { AuthenticationError } from '../../lib/errors'
 
 // Constants:
-import env from '../../config/env'
+import { env } from '../../config/env'
 
 // Functions:
 const getRefreshTokenExpiryDate = () => {
@@ -21,7 +21,7 @@ const getRefreshTokenExpiryDate = () => {
 }
 
 const issueSessionForUser = async (input: {
-  userId: string
+  userId: number
   email: string
   userAgent: string | null
   ipAddress: string | null
@@ -61,7 +61,8 @@ const loginWithGoogle = async (input: {
     redirectUri: input.redirectUri,
   })
 
-  if (!identity.emailVerified) throw new AuthenticationError('GOOGLE_EMAIL_UNVERIFIED', 'Google account email is not verified.')
+  if (!identity.emailVerified)
+    throw new AuthenticationError('GOOGLE_EMAIL_UNVERIFIED', 'Google account email is not verified.')
 
   const user = await findOrCreateUserByGoogleIdentity({
     email: identity.email,
@@ -88,11 +89,7 @@ const loginWithGoogle = async (input: {
   }
 }
 
-const refreshSession = async (input: {
-  refreshToken: string
-  userAgent: string | null
-  ipAddress: string | null
-}) => {
+const refreshSession = async (input: { refreshToken: string; userAgent: string | null; ipAddress: string | null }) => {
   const currentTokenHash = hashToken(input.refreshToken)
 
   const existingToken = await findActiveRefreshTokenByHash(currentTokenHash)
@@ -142,8 +139,4 @@ const logoutSession = async (refreshToken: string) => {
 }
 
 // Exports:
-export {
-  loginWithGoogle,
-  refreshSession,
-  logoutSession,
-}
+export { loginWithGoogle, refreshSession, logoutSession }

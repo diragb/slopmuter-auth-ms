@@ -7,7 +7,7 @@ describe('jwt', () => {
   describe('signAccessToken', () => {
     it('produces a JWT with expected claims', () => {
       const payload = {
-        sub: 'user-123',
+        sub: 123,
         email: 'test@example.com',
         type: 'access' as const,
       }
@@ -18,20 +18,20 @@ describe('jwt', () => {
 
     it('decodes to correct sub, email, and type claims', () => {
       const payload = {
-        sub: 'user-456',
+        sub: 456,
         email: 'alice@example.com',
         type: 'access' as const,
       }
       const token = signAccessToken(payload)
       const decoded = jwt.decode(token) as Record<string, unknown>
-      expect(decoded['sub']).toBe('user-456')
+      expect(decoded['sub']).toBe(456)
       expect(decoded['email']).toBe('alice@example.com')
       expect(decoded['type']).toBe('access')
     })
 
     it('includes exp claim', () => {
       const payload = {
-        sub: 'user-789',
+        sub: 789,
         email: 'bob@example.com',
         type: 'access' as const,
       }
@@ -39,7 +39,7 @@ describe('jwt', () => {
       const decoded = jwt.decode(token) as Record<string, unknown>
       expect(decoded['exp']).toBeDefined()
       expect(typeof decoded['exp']).toBe('number')
-      expect((decoded['exp'] as number)).toBeGreaterThan(Math.floor(Date.now() / 1000))
+      expect(decoded['exp'] as number).toBeGreaterThan(Math.floor(Date.now() / 1000))
     })
   })
 })

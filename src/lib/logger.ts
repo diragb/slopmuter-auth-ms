@@ -2,7 +2,7 @@
 import pino from 'pino'
 
 // Constants:
-import env from '../config/env'
+import { env } from '../config/env'
 
 const logger = pino({
   level: env.nodeEnv === 'production' ? 'info' : 'debug',

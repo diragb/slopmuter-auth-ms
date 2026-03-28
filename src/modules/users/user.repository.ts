@@ -5,7 +5,7 @@ import { pool } from '../../config/db'
 import type { QueryResultRow } from 'pg'
 
 interface User {
-  id: string
+  id: number
   email: string
   name: string | null
   avatarUrl: string | null
@@ -22,7 +22,7 @@ interface User {
  */
 const mapUserRow = (row: QueryResultRow): User => {
   return {
-    id: String(row['id']),
+    id: row['id'],
     email: row['email'],
     name: row['name'],
     avatarUrl: row['avatarUrl'],
@@ -37,11 +37,11 @@ const mapUserRow = (row: QueryResultRow): User => {
  * @param userId - The internal user ID to look up.
  * @returns The matching user, or null if not found.
  */
-const findUserById = async (userId: string): Promise<User | null> => {
+const findUserById = async (userId: number): Promise<User | null> => {
   const result = await pool.query(
     `
       select
-        id::text,
+        id,
         email,
         name,
         avatar_url as "avatarUrl",
@@ -72,7 +72,7 @@ const findUserByProviderIdentity = async (input: {
   const result = await pool.query(
     `
       select
-        id::text,
+        id,
         email,
         name,
         avatar_url as "avatarUrl",
@@ -118,7 +118,7 @@ const createUser = async (input: {
       )
       values ($1, $2, $3, $4, $5)
       returning
-        id::text,
+        id,
         email,
         name,
         avatar_url as "avatarUrl",

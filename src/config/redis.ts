@@ -2,7 +2,7 @@
 import Redis from 'ioredis'
 
 // Constants:
-import env from './env'
+import { env } from './env'
 import logger from '../lib/logger'
 
 const redis = new Redis(env.redisUrl, {
@@ -10,8 +10,8 @@ const redis = new Redis(env.redisUrl, {
   lazyConnect: true,
 })
 
-redis.on('error', err => {
-  logger.error({ err }, 'Redis connection error')
+redis.on('error', error => {
+  logger.error({ error }, 'Redis connection error')
 })
 redis.on('connect', () => {
   logger.info('Redis connected')

@@ -18,15 +18,12 @@ interface GoogleTokenResponse {
 }
 
 // Constants:
-import env from '../../config/env'
+import { env } from '../../config/env'
 
 const oauthClient = new OAuth2Client(env.googleClientId)
 
 // Functions:
-const exchangeCodeForGoogleIdentity = async (input: {
-  code: string
-  redirectUri: string
-}): Promise<OAuthIdentity> => {
+const exchangeCodeForGoogleIdentity = async (input: { code: string; redirectUri: string }): Promise<OAuthIdentity> => {
   const response = await fetch(env.googleTokenEndpoint, {
     method: 'POST',
     headers: {

@@ -13,18 +13,24 @@ export class AppError extends Error {
   }
 }
 
-export class AuthenticationError extends AppError {
-  constructor(code: string, message: string) {
-    super(401, code, message)
-  }
-}
-
 export class ValidationError extends AppError {
   public readonly details?: unknown
 
   constructor(code: string, message: string, details?: unknown) {
     super(400, code, message)
     this.details = details
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(code: string, message: string) {
+    super(401, code, message)
+  }
+}
+
+export class ForbiddenError extends AppError {
+  constructor(code: string, message: string) {
+    super(403, code, message)
   }
 }
 

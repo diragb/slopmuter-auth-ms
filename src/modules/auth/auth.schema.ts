@@ -2,7 +2,7 @@
 import { z } from 'zod'
 
 // Constants:
-import env from '../../config/env'
+import { env } from '../../config/env'
 
 // Functions:
 const refreshTokenSchema = z.object({
