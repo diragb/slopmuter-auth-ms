@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 interface AccessTokenPayload {
   sub: number
   email: string
-  type: 'access'
+  type: string
 }
 
 // Constants:

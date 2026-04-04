@@ -22,12 +22,12 @@ interface User {
  */
 const mapUserRow = (row: QueryResultRow): User => {
   return {
-    id: row['id'],
-    email: row['email'],
-    name: row['name'],
-    avatarUrl: row['avatarUrl'],
-    authProvider: row['authProvider'],
-    providerUserId: row['providerUserId'],
+    id: Number(row['id']),
+    email: String(row['email']),
+    name: String(row['name']),
+    avatarUrl: String(row['avatarUrl']),
+    authProvider: String(row['authProvider']),
+    providerUserId: String(row['providerUserId']),
   }
 }
 
